@@ -14,7 +14,7 @@ type FormState = {
 };
 
 export async function createNote(
-  _prevState: FormState,
+  _prevState: FormState = { success: false },
   formData: FormData
 ): Promise<FormState> {
   try {
@@ -37,19 +37,19 @@ export async function createNote(
     await prisma.note.create({
       data: {
         title,
-        content,
         authorId: author.id,
+        content,
       },
     });
+
+    console.log("nota creada")
 
     revalidatePath(revalidateRoute || "/");
     return { success: true, message: "Note created!" };
   } catch (error) {
-    console.error("Note creation failed:", error);
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "Database error occurred",
+      message: error instanceof Error ? error.message : "Failed to create note",
     };
   }
 }
